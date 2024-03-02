@@ -11,7 +11,6 @@ object Loginfrm: TLoginfrm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OnShow = FormShow
   TextHeight = 15
   object Panel1: TPanel
     Left = 0
@@ -58,13 +57,13 @@ object Loginfrm: TLoginfrm
       ExplicitLeft = 48
       ExplicitWidth = 185
       ExplicitHeight = 41
-      object SpeedButton1: TSpeedButton
+      object LoginButton: TSpeedButton
         Left = 8
         Top = 109
         Width = 257
         Height = 49
         Caption = 'Login'
-        OnClick = SpeedButton1Click
+        OnClick = LoginButtonClick
       end
       object PasswordField: TLabeledEdit
         Left = 8
