@@ -40,8 +40,8 @@ begin
   if Success then
   begin
     //ShowMessage('로그인 성공!');
-    Hide;
-    Mainfrm.Show;
+    self.Close;
+    //Mainfrm.Show;
   end
   else
   begin

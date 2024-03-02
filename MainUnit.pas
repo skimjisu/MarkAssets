@@ -10,6 +10,7 @@ type
   TMainfrm = class(TForm)
    // Panel1: TPanel;
     procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -22,6 +23,11 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TMainfrm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  //Action := caFree;
+end;
 
 procedure TMainfrm.FormCreate(Sender: TObject);
 var
