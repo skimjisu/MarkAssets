@@ -1,5 +1,4 @@
 ﻿[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fskimjisu&count_bg=%23FFD5D5&title_bg=%23FF7575&icon=&icon_color=%23E7E7E7&title=VISIT&edge_flat=false)](https://hits.seeyoufarm.com)
-
 # MarkAssets
 
 ## 소개
@@ -21,5 +20,6 @@ DBMS: SQLite를 사용하여 빠르고 안정적인 데이터 관리를 지원�
 이 프로젝트는 MIT 라이센스 하에 배포되며, 자세한 사항은 LICENSE 파일을 참조하세요.
 
 ## 문의
+
 문제가 발생하거나 추가적인 정보가 필요하신 경우, 이슈를 등록하시거나 이메일로 문의해주시기 바랍니다.
 프로젝트의 세부 사항에 따라 필요한 정보를 추가하거나 수정하시면 됩니다.
