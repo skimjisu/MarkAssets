@@ -3,7 +3,7 @@ unit DBProce;
 interface
 
 uses
-  FireDAC.Comp.Client, Data.DB, IdHashMessageDigest;
+  Windows , FireDAC.Comp.Client, Data.DB, FireDAC.Phys.SQLite, IdHashMessageDigest, Dialogs, System.SysUtils;
 
 function CreateDBConnection: TFDConnection;
 function HashPassword(const Password: string): string;
@@ -16,10 +16,19 @@ var
 
 function CreateDBConnection: TFDConnection;
 begin
-  Result := TFDConnection.Create(nil);
-  Result.DriverName := 'SQLite';
-  Result.Params.Values['Database'] := '..\DB\MarkAssets.db';  // 데이터베이스 파일 경로를 적절하게 수정해주세요.
-  Result.Connected := True;
+   Result := TFDConnection.Create(nil);
+  try
+    Result.DriverName := 'SQLite';
+    Result.Params.Values['Database'] := 'C:\Users\KDHS\Desktop\MarkAssets\MarkAssets\DB\MarkDB.db';  // 데이터베이스 파일 경로를 적절하게 수정해주세요.
+    Result.Connected := True;
+    //ShowMessage('데이터베이스 연결 성공!');
+  except
+    on E: Exception do
+    begin
+      MessageBox(0, PChar('데이터베이스 연결 실패: ' + E.Message), PChar('경고'), MB_ICONWARNING or MB_OK);
+      FreeAndNil(Result);
+    end;
+  end;
 end;
 
 function HashPassword(const Password: string): string;
