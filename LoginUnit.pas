@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.VirtualImage, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls, LoginControl, FireDAC.UI.Intf, FireDAC.VCLUI.Wait, FireDAC.Stan.Intf,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.VirtualImage, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls, LoginProce, FireDAC.UI.Intf, FireDAC.VCLUI.Wait, FireDAC.Stan.Intf,
   FireDAC.Comp.UI, DBProce, MainUnit;
 
 type
@@ -25,7 +25,7 @@ type
     { Public declarations }
 
   public
-    procedure LoginControlLogin(Sender: TObject; Success: Boolean);
+    procedure ProcessLogin(Sender: TObject; Success: Boolean);
   end;
 
 var
@@ -35,13 +35,12 @@ implementation
 
 {$R *.dfm}
 
-procedure TLoginfrm.LoginControlLogin(Sender: TObject; Success: Boolean);
+procedure TLoginfrm.ProcessLogin(Sender: TObject; Success: Boolean);
 begin
   if Success then
   begin
     //ShowMessage('로그인 성공!');
     self.Close;
-    //Mainfrm.Show;
   end
   else
   begin
@@ -55,7 +54,7 @@ var
 begin
   LoginControl := TLoginControl.Create(UsernameField.Text, PasswordField.Text);
   try
-    LoginControl.OnLogin := LoginControlLogin;
+    LoginControl.OnLogin := ProcessLogin;
     LoginControl.Login;
   finally
     LoginControl.Free;

@@ -19,7 +19,7 @@ begin
    Result := TFDConnection.Create(nil);
   try
     Result.DriverName := 'SQLite';
-    Result.Params.Values['Database'] := 'C:\Users\KDHS\Desktop\MarkAssets\MarkAssets\DB\MarkDB.db';  // 데이터베이스 파일 경로를 적절하게 수정해주세요.
+    Result.Params.Values['Database'] := 'C:\Users\KDHS\Desktop\MarkAssets\MarkAssets\DB\MarkDB.db';  // 데이터베이스 파일 경로 수정해주세요.
     Result.Connected := True;
     //ShowMessage('데이터베이스 연결 성공!');
   except

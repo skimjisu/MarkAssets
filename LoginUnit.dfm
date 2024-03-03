@@ -4,7 +4,7 @@ object Loginfrm: TLoginfrm
   BorderStyle = bsSingle
   Caption = 'Loginfrm'
   ClientHeight = 302
-  ClientWidth = 277
+  ClientWidth = 274
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,26 +15,22 @@ object Loginfrm: TLoginfrm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 277
+    Width = 274
     Height = 302
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 232
-    ExplicitTop = 224
-    ExplicitWidth = 185
-    ExplicitHeight = 41
+    ExplicitWidth = 273
+    ExplicitHeight = 301
     object Panel2: TPanel
       Left = 0
       Top = 0
-      Width = 277
+      Width = 274
       Height = 128
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitLeft = 1
-      ExplicitTop = 1
-      ExplicitWidth = 275
+      ExplicitWidth = 273
       object VirtualImage1: TVirtualImage
         Left = 88
         Top = 16
@@ -48,15 +44,14 @@ object Loginfrm: TLoginfrm
     object Panel3: TPanel
       Left = 0
       Top = 128
-      Width = 277
+      Width = 274
       Height = 174
       Align = alClient
       BevelOuter = bvNone
       Caption = 'Panel3'
       TabOrder = 1
-      ExplicitLeft = 48
-      ExplicitWidth = 185
-      ExplicitHeight = 41
+      ExplicitWidth = 273
+      ExplicitHeight = 173
       object LoginButton: TSpeedButton
         Left = 8
         Top = 109
@@ -73,6 +68,7 @@ object Loginfrm: TLoginfrm
         EditLabel.Width = 50
         EditLabel.Height = 15
         EditLabel.Caption = 'Password'
+        PasswordChar = '*'
         TabOrder = 1
         Text = '1111'
       end

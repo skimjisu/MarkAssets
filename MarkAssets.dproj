@@ -100,7 +100,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Controller\DBProce.pas"/>
-        <DCCReference Include="Controller\LoginControl.pas"/>
+        <DCCReference Include="Controller\LoginProce.pas"/>
         <DCCReference Include="LoginUnit.pas">
             <Form>Loginfrm</Form>
         </DCCReference>
@@ -108,6 +108,13 @@
             <Form>Mainfrm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Common.pas"/>
+        <DCCReference Include="Controller\RoundProce.pas"/>
+        <DCCReference Include="view\DashboardFrm.pas">
+            <Form>DashbdFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Controller\FactoryProce.pas"/>
         <None Include="README.md"/>
         <None Include=".gitattributes"/>
         <None Include="DB\MarkDB.db"/>

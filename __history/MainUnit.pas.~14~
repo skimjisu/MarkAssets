@@ -1,0 +1,140 @@
+unit MainUnit;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.ComCtrls,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Grids, Vcl.Imaging.pngimage, Vcl.Buttons, LoginProce, Common, RoundProce, DashboardFrm;
+
+type
+  TMainfrm = class(TForm)
+    Menu_pn: TPanel;
+    Image2: TImage;
+    Label3: TLabel;
+    Image3: TImage;
+    Label4: TLabel;
+    Label5: TLabel;
+    Image4: TImage;
+    Label6: TLabel;
+    Image5: TImage;
+    Label7: TLabel;
+    Image6: TImage;
+    Label8: TLabel;
+    Image7: TImage;
+    Label10: TLabel;
+    Panel1: TPanel;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    Label1: TLabel;
+    Label2: TLabel;
+    Image1: TImage;
+    Label9: TLabel;
+   // Panel1: TPanel;
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure Panel1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure Panel1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Mainfrm: TMainfrm;
+
+implementation
+
+{$R *.dfm}
+
+procedure TMainfrm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  //Action := caFree;
+end;
+
+procedure TMainfrm.FormCreate(Sender: TObject);
+const
+  TabNames: array[0..5] of string = ('Dashboard', 'Inventory', 'List', 'Service', 'Admin', 'Users');
+var
+  ViewPanel: TPanel;
+  PageControl: TPageControl;
+  TabSheet: TTabSheet;
+  DashbdFrm: TDashbdFrm;
+  I: Integer;
+begin
+  SetRoundedCorners(self.Handle, TRoundedWindowCornerType(2));
+
+  // TPanel 积己
+  ViewPanel := TPanel.Create(Self);
+  with ViewPanel do
+  begin
+    Parent := Self;
+    Align := alClient;
+    BorderStyle := bsNone;
+  end;
+
+  // TPageControl 积己
+  PageControl := TPageControl.Create(ViewPanel);
+  with PageControl do
+  begin
+    Parent := ViewPanel;
+    Align := alClient;
+
+    // 阿 徘 积己
+    for I := Low(TabNames) to High(TabNames) do
+    begin
+      TabSheet := TTabSheet.Create(Self);
+      with TabSheet do
+      begin
+        PageControl := Self.Parent as TPageControl;
+        Caption := TabNames[I];
+        TabVisible := False;
+
+        // 'Dashboard' 徘俊 措茄 贸府
+        if I = 0 then
+        begin
+          DashbdFrm := TDashbdFrm.Create(Self);
+          with DashbdFrm do
+          begin
+            Parent := TabSheet;
+            Align := alClient;
+            Visible := True;
+          end;
+        end;
+      end;
+    end;
+
+    ActivePageIndex := 0;
+  end;
+end;
+
+
+
+procedure TMainfrm.FormShow(Sender: TObject);
+begin
+  SpeedButton2.Caption := LoggedUser;
+end;
+
+procedure TMainfrm.Panel1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+const
+  sc_DragMove = $F012;
+begin
+  ReleaseCapture;
+  Perform(wm_SysCommand, sc_DragMove, 0);
+end;
+
+procedure TMainfrm.Panel1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+begin
+  ReleaseCapture;
+  SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+end;
+
+procedure TMainfrm.SpeedButton1Click(Sender: TObject);
+begin
+  application.Terminate;
+end;
+
+end.

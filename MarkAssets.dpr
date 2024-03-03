@@ -5,9 +5,13 @@ uses
   System.SysUtils,
   FireDAC.Comp.UI,
   DBProce in 'Controller\DBProce.pas',
-  LoginControl in 'Controller\LoginControl.pas',
+  LoginProce in 'Controller\LoginProce.pas',
   LoginUnit in 'LoginUnit.pas' {Loginfrm},
-  MainUnit in 'MainUnit.pas' {Mainfrm};
+  MainUnit in 'MainUnit.pas' {Mainfrm},
+  Common in 'Common.pas',
+  RoundProce in 'Controller\RoundProce.pas',
+  DashboardFrm in 'view\DashboardFrm.pas' {DashbdFrm},
+  FactoryProce in 'Controller\FactoryProce.pas';
 
 {$R *.res}
 
@@ -19,5 +23,6 @@ begin
   LoginFrm := TLoginFrm.Create(Nil);
   LoginFrm.ShowModal;
   Application.CreateForm(TMainfrm, Mainfrm);
+  Application.CreateForm(TDashbdFrm, DashbdFrm);
   Application.Run;
 end.

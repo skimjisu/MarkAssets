@@ -1,0 +1,10 @@
+unit Common;
+
+LoggedUser: string;
+
+interface
+
+
+implementation
+
+end.

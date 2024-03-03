@@ -1,0 +1,21 @@
+program MarkAssets;
+
+uses
+  Vcl.Forms,
+  System.SysUtils,
+  FireDAC.Comp.UI,
+  DBProce in 'Controller\DBProce.pas',
+  LoginControl in 'Controller\LoginControl.pas',
+  LoginUnit in 'LoginUnit.pas' {Loginfrm},
+  MainUnit in 'MainUnit.pas' {Form2};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  //TFDGUIxWaitCursor.RegisterProvider;
+  Application.CreateForm(TLoginfrm, Loginfrm);
+  Application.CreateForm(TForm2, Form2);
+  Application.Run;
+end.
