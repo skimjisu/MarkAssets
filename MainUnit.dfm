@@ -503,9 +503,10 @@ object Mainfrm: TMainfrm
     Height = 41
     Align = alTop
     BevelOuter = bvNone
-    Color = clCream
+    Color = 4471089
     ParentBackground = False
     TabOrder = 1
+    OnDblClick = Panel1DblClick
     OnMouseDown = Panel1MouseDown
     OnMouseMove = Panel1MouseMove
     object SpeedButton1: TSpeedButton

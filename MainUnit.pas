@@ -44,6 +44,7 @@ type
     procedure SpeedButton2Click(Sender: TObject);
     procedure Label4Click(Sender: TObject);
     procedure MenuClick(Sender: TObject);
+    procedure Panel1DblClick(Sender: TObject);
   private
     FPageControl: TPageControl;
     procedure CreateFormInTab(TabCaption: string; FormClass: TFormClass);
@@ -161,6 +162,12 @@ end;
 procedure TMainfrm.Label4Click(Sender: TObject);
 begin
   FPageControl.ActivePageIndex := 1;
+end;
+
+procedure TMainfrm.Panel1DblClick(Sender: TObject);
+begin
+  if self.WindowState = wsMaximized then self.WindowState := wsNormal
+  else self.WindowState := wsMaximized;
 end;
 
 procedure TMainfrm.Panel1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
