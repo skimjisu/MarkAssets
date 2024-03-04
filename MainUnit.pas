@@ -3,8 +3,8 @@ unit MainUnit;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.ComCtrls, FactoryProce,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Grids, Vcl.Imaging.pngimage, Vcl.Buttons, LoginProce, Common, RoundProce, DashboardFrm;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.ComCtrls, FactoryProce, InventoryFrm,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Grids, Vcl.Imaging.pngimage, Vcl.Buttons, LoginProce, Common, RoundProce, DashboardFrm, DBProce;
 
 type
   TMainfrm = class(TForm)
@@ -30,6 +30,7 @@ type
     Label2: TLabel;
     Image1: TImage;
     Label9: TLabel;
+    PagePanel: TPanel;
    // Panel1: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -39,9 +40,15 @@ type
     procedure Panel1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure ChangeLabelOnMouseEnter(Sender: TObject);
     procedure ChangeLabelOnMouseLeave(Sender: TObject);
+    procedure Label10Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure Label4Click(Sender: TObject);
+    procedure MenuClick(Sender: TObject);
   private
-    { Private declarations }
-
+    FPageControl: TPageControl;
+    procedure CreateFormInTab(TabCaption: string; FormClass: TFormClass);
+  public
+   //
   public
     { Public declarations }
     procedure ChangeLabel;
@@ -68,21 +75,26 @@ begin
 end;
 
 procedure TMainfrm.ChangeLabel;
+const
+  TargetLabelNames: array[0..5] of string =
+    ('Label3', 'Label4', 'Label6', 'Label7', 'Label8', 'Label10');
 var
-  i: Integer;
-  labelName: String;
+  i, j: Integer;
+  currentLabel: TLabel;
 begin
   for i := 0 to ComponentCount - 1 do
   begin
     if Components[i] is TLabel then
     begin
-      labelName := TLabel(Components[i]).Name;
-      if (labelName = 'Label3') or (labelName = 'Label4') or
-         (labelName = 'Label6') or (labelName = 'Label7') or
-         (labelName = 'Label8') or (labelName = 'Label10') then
+      currentLabel := TLabel(Components[i]);
+      for j := Low(TargetLabelNames) to High(TargetLabelNames) do
       begin
-        TLabel(Components[i]).OnMouseEnter := ChangeLabelOnMouseEnter;
-        TLabel(Components[i]).OnMouseLeave := ChangeLabelOnMouseLeave;
+        if currentLabel.Name = TargetLabelNames[j] then
+        begin
+          currentLabel.OnMouseEnter := ChangeLabelOnMouseEnter;
+          currentLabel.OnMouseLeave := ChangeLabelOnMouseLeave;
+          Break;
+        end;
       end;
     end;
   end;
@@ -94,86 +106,61 @@ begin
   //Action := caFree;
 end;
 
-(*
-  procedure TMainfrm.FormCreate(Sender: TObject);
-  const
-    TabNames: array[0..5] of string = ('Dashboard', 'Inventory', 'List', 'Service', 'Admin', 'Users');
-  var
-    ViewPanel: TPanel;
-    PageControl: TPageControl;
-    DashbdFrm: TDashbdFrm;
-    I: Integer;
-  begin
-    SetRoundedCorners(self.Handle, TRoundedWindowCornerType(2));
-
-    // TPanel 积己
-    ViewPanel := TPanel.Create(Self);
-    with ViewPanel do
-    begin
-      Parent := Self;
-      Align := alClient;
-      BorderStyle := bsNone;
-    end;
-
-    // TPageControl 积己
-    PageControl := TPageControl.Create(ViewPanel);
-    with PageControl do
-    begin
-      Parent          := ViewPanel;
-      Align           := alClient;
-      MultiLine       := True;
-      ScrollOpposite  := True;
-      TabWidth        := 100;
-      TabHeight       := 20;
-
-      // 阿 徘 积己
-      for I := Low(TabNames) to High(TabNames) do
-        with TTabSheet.Create(PageControl) do
-        begin
-          PageControl := Self.Parent as TPageControl;
-          Caption := TabNames[I];
-
-          // 'Dashboard' 徘俊 措茄 贸府
-          if I = 0 then
-          begin
-            DashbdFrm := TDashbdFrm.Create(Self);
-            with DashbdFrm do
-            begin
-              Parent := Self;
-              Align := alClient;
-              Visible := True;
-            end;
-          end;
-        end;
-
-      ActivePageIndex := 0;
-    end;
-  end;
-*)
-procedure TMainfrm.FormCreate(Sender: TObject);
-const
-  TabNames: array[0..5] of string = ('Dashboard', 'Inventory', 'List', 'Service', 'Admin', 'Users');
+procedure TMainFrm.CreateFormInTab(TabCaption: string; FormClass: TFormClass);
 var
-  ViewPanel: TPanel;
-  PageControl: TPageControl;
-  I: Integer;
+  TabSheet: TTabSheet;
+  i: integer;
 begin
-  SetRoundedCorners(self.Handle, TRoundedWindowCornerType(2));
+  TabSheet := TControlFactory.CreateAndSetupTabSheet(FPageControl, TabCaption);
+  TControlFactory.CreateAndSetupForm(TabSheet, FormClass);
+
+  for i := 0 to FPageControl.PageCount - 1 do
+  FPageControl.Pages[i].TabVisible := False;
+end;
+
+procedure TMainfrm.FormCreate(Sender: TObject);
+begin
   ChangeLabel;
-  ViewPanel := TControlFactory.CreateAndSetupPanel(Self);
-  PageControl := TControlFactory.CreateAndSetupPageControl(ViewPanel);
+  SetRoundedCorners(self.Handle, TRoundedWindowCornerType(2));
 
-  for I := Low(TabNames) to High(TabNames) do
-    with TControlFactory.CreateAndSetupTabSheet(PageControl, TabNames[I]) do
-      if I = 0 then
-        TDashbdFrmFactory.CreateAndSetupDashbdFrm(Self);
+  FPageControl := TControlFactory.CreateAndSetupPageControl(self.PagePanel);
 
-  PageControl.ActivePageIndex := 0;
+  // Create forms in tabs
+  CreateFormInTab('Dashboard', TDashbdFrm);
+  CreateFormInTab('Inventory', TInvFrm);
+  FPageControl.ActivePageIndex := 0;
+end;
+
+procedure TMainFrm.MenuClick(Sender: TObject);
+var
+  Ima: TImage;
+  lb: TLabel;
+begin
+  if Sender is TImage then
+  begin
+    Ima := TImage(Sender);
+    FPageControl.ActivePageIndex := Ima.Tag - 1;
+  end
+  else if Sender is TLabel then
+  begin
+    lb := TLabel(Sender);
+    FPageControl.ActivePageIndex := lb.Tag - 1;
+  end;
 end;
 
 procedure TMainfrm.FormShow(Sender: TObject);
 begin
   SpeedButton2.Caption := LoggedUser;
+end;
+
+procedure TMainfrm.Label10Click(Sender: TObject);
+begin
+  FPageControl.ActivePageIndex := 0;
+end;
+
+procedure TMainfrm.Label4Click(Sender: TObject);
+begin
+  FPageControl.ActivePageIndex := 1;
 end;
 
 procedure TMainfrm.Panel1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -192,7 +179,12 @@ end;
 
 procedure TMainfrm.SpeedButton1Click(Sender: TObject);
 begin
-  application.Terminate;
+  Application.Terminate;
+end;
+
+procedure TMainfrm.SpeedButton2Click(Sender: TObject);
+begin
+  UpdateInventoryFromCSV('C:\Users\KDHS\Downloads\1234.csv');
 end;
 
 end.

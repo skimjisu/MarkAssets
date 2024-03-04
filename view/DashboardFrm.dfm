@@ -22,10 +22,6 @@ object DashbdFrm: TDashbdFrm
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = -418
-    ExplicitTop = -121
-    ExplicitWidth = 1046
-    ExplicitHeight = 563
     object PageControl1: TPageControl
       Left = 0
       Top = 0
@@ -34,8 +30,6 @@ object DashbdFrm: TDashbdFrm
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 1046
-      ExplicitHeight = 563
       object TabSheet1: TTabSheet
         Caption = 'Home'
         DesignSize = (
@@ -50,7 +44,6 @@ object DashbdFrm: TDashbdFrm
           Caption = ''
           Color = 10329945
           TabOrder = 0
-          ExplicitLeft = 530
           object Label1: TLabel
             Left = 34
             Top = 97
@@ -159,7 +152,6 @@ object DashbdFrm: TDashbdFrm
           Caption = ''
           Color = 14065771
           TabOrder = 1
-          ExplicitLeft = 530
           object Label2: TLabel
             Left = 50
             Top = 97
@@ -256,7 +248,6 @@ object DashbdFrm: TDashbdFrm
           Caption = ''
           Color = 6257402
           TabOrder = 2
-          ExplicitLeft = 866
           object Label3: TLabel
             Left = 17
             Top = 93
@@ -382,7 +373,6 @@ object DashbdFrm: TDashbdFrm
           Caption = ''
           Color = 13597321
           TabOrder = 3
-          ExplicitLeft = 698
           object Label4: TLabel
             Left = 35
             Top = 97
@@ -488,7 +478,6 @@ object DashbdFrm: TDashbdFrm
           Caption = ''
           Color = 13553195
           TabOrder = 4
-          ExplicitLeft = 698
           object Label5: TLabel
             Left = 50
             Top = 97
@@ -580,7 +569,6 @@ object DashbdFrm: TDashbdFrm
           Caption = ''
           Color = 8839033
           TabOrder = 5
-          ExplicitLeft = 866
           object Label7: TLabel
             Left = 44
             Top = 93
@@ -975,8 +963,6 @@ object DashbdFrm: TDashbdFrm
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
-    ExplicitLeft = -418
-    ExplicitWidth = 1046
     object Label6: TLabel
       Left = 24
       Top = 9
@@ -997,7 +983,6 @@ object DashbdFrm: TDashbdFrm
       Height = 1
       Align = alBottom
       TabOrder = 0
-      ExplicitWidth = 1046
     end
   end
   object ImageCollection1: TImageCollection

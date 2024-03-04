@@ -11,7 +11,8 @@ uses
   Common in 'Common.pas',
   RoundProce in 'Controller\RoundProce.pas',
   DashboardFrm in 'view\DashboardFrm.pas' {DashbdFrm},
-  FactoryProce in 'Controller\FactoryProce.pas';
+  FactoryProce in 'Controller\FactoryProce.pas',
+  InventoryFrm in 'view\InventoryFrm.pas' {InvFrm};
 
 {$R *.res}
 
@@ -24,5 +25,6 @@ begin
   LoginFrm.ShowModal;
   Application.CreateForm(TMainfrm, Mainfrm);
   Application.CreateForm(TDashbdFrm, DashbdFrm);
+  Application.CreateForm(TInvFrm, InvFrm);
   Application.Run;
 end.

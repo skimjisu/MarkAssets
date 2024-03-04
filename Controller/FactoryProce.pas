@@ -3,71 +3,43 @@ unit FactoryProce;
 interface
 
 uses
-  Vcl.Controls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Forms, DashboardFrm;
+  Vcl.Controls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Forms, System.Classes, DashboardFrm, InventoryFrm;
 
 type
-  TControlFactory = class(TObject)
+  TControlFactory = class
   public
-    class function CreateAndSetupPanel(ParentControl: TWinControl): TPanel;
-    class function CreateAndSetupPageControl(ParentControl: TWinControl): TPageControl;
-    class function CreateAndSetupTabSheet(PageControl: TPageControl; const TabName: string): TTabSheet;
-  end;
-
-  TDashbdFrmFactory = class(TObject)
-  public
-    class function CreateAndSetupDashbdFrm(ParentControl: TWinControl): TDashbdFrm;
+    class function CreateAndSetupPageControl(Parent: TWinControl): TPageControl;
+    class function CreateAndSetupTabSheet(PageControl: TPageControl; const Caption: string): TTabSheet;
+    class function CreateAndSetupForm(Parent: TWinControl; FormClass: TFormClass): TForm;
   end;
 
 implementation
 
-{ TControlFactory }
-
-class function TControlFactory.CreateAndSetupPanel(ParentControl: TWinControl): TPanel;
+class function TControlFactory.CreateAndSetupPageControl(Parent: TWinControl): TPageControl;
 begin
-  Result          := TPanel.Create(ParentControl);
-  with Result do
-  begin
-    Parent        := ParentControl;
-    Align         := alClient;
-    BorderStyle   := bsNone;
-  end;
+  Result := TPageControl.Create(Parent);
+  Result.Parent := Parent;
+  Result.Align := alClient;
 end;
 
-class function TControlFactory.CreateAndSetupPageControl(ParentControl: TWinControl): TPageControl;
+class function TControlFactory.CreateAndSetupTabSheet(PageControl: TPageControl; const Caption: string): TTabSheet;
 begin
-  Result            := TPageControl.Create(ParentControl);
-  with Result do
-  begin
-    Parent          := ParentControl;
-    Align           := alClient;
-    MultiLine       := True;
-    ScrollOpposite  := True;
-    TabWidth        := 100;
-    TabHeight       := 20;
-  end;
+  Result := TTabSheet.Create(PageControl);
+  Result.PageControl := PageControl;
+  Result.Caption := Caption;
+  //Result.Visible := False;
 end;
 
-class function TControlFactory.CreateAndSetupTabSheet(PageControl: TPageControl; const TabName: string): TTabSheet;
+class function TControlFactory.CreateAndSetupForm(Parent: TWinControl; FormClass: TFormClass): TForm;
 begin
-  Result        := TTabSheet.Create(PageControl);
-  with Result do
-  begin
-    PageControl := PageControl;
-    Caption     := TabName;
-  end;
+  Result := FormClass.Create(Parent);
+  Result.Parent := Parent;
+  Result.Align := alClient;
+  //Result.BorderStyle := bsNone;
+  Result.Visible := true;
 end;
 
-{ TDashbdFrmFactory }
-
-class function TDashbdFrmFactory.CreateAndSetupDashbdFrm(ParentControl: TWinControl): TDashbdFrm;
-begin
-  Result    := TDashbdFrm.Create(ParentControl);
-  with Result do
-  begin
-    Parent  := ParentControl;
-    Align   := alClient;
-    Visible := True;
-  end;
-end;
 end.
 
+
+end.

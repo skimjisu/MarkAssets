@@ -1,54 +1,24 @@
 unit RoundProce;
 
 interface
+
 uses
-  Winapi.Windows;
+  Winapi.Windows, Winapi.Dwmapi;
 
-type TRoundedWindowCornerType = (RoundedCornerDefault, RoundedCornerOff, RoundedCornerOn, RoundedCornerSmall);
+type
+  TRoundedWindowCornerType = (RoundedCornerDefault, RoundedCornerOff, RoundedCornerOn, RoundedCornerSmall);
 
-////////////////////////////////////////////////////////////////////////////
-//
-// Originally written by Ian Barker
-//            https://github.com/checkdigits
-//            https://about.me/IanBarker
-//            ian.barker@gmail.com
-//
-// Based on an example in an answer during the RAD Studio 11 Launch Q & A
-//
-//
-// Free software - use for any purpose including commercial use.
-//
-////////////////////////////////////////////////////////////////////////////
-//
-// Set or prevent Windows 11 from rounding the corners or your application
-//
-// Usage:
-//         SetRoundedCorners(Self.Handle, RoundedCornerSmall);
-//
-////////////////////////////////////////////////////////////////////////////
-///
 procedure SetRoundedCorners(const TheHandle: HWND; const CornerType: TRoundedWindowCornerType);
 
-
 implementation
-uses
-  Winapi.Dwmapi;
 
 const
+  DWMWCP_DEFAULT    = 0; // 시스템이 창 모서리를 둥글게 만들지 결정하도록 합니다.
+  DWMWCP_DONOTROUND = 1; // 창 모서리를 절대 둥글게 만들지 않습니다.
+  DWMWCP_ROUND      = 2; // 적절한 경우 창 모서리를 둥글게 만듭니다.
+  DWMWCP_ROUNDSMALL = 3; // 적절한 경우 작은 반경으로 창 모서리를 둥글게 만듭니다.
 
-  //
-  // More information:
-  //      https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/apply-rounded-corners
-  //      https://docs.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute
-  //      https://docs.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmsetwindowattribute
-  //
-
-  DWMWCP_DEFAULT    = 0; // Let the system decide whether or not to round window corners
-  DWMWCP_DONOTROUND = 1; // Never round window corners
-  DWMWCP_ROUND      = 2; // Round the corners if appropriate
-  DWMWCP_ROUNDSMALL = 3; // Round the corners if appropriate, with a small radius
-
-  DWMWA_WINDOW_CORNER_PREFERENCE = 33; // [set] WINDOW_CORNER_PREFERENCE, Controls the policy that rounds top-level window corners
+  DWMWA_WINDOW_CORNER_PREFERENCE = 33; // 창 모서리 정책을 제어하는 값
 
 procedure SetRoundedCorners(const TheHandle: HWND; const CornerType: TRoundedWindowCornerType);
 var
@@ -61,6 +31,8 @@ begin
   else
     DWM_WINDOW_CORNER_PREFERENCE := DWMWCP_DEFAULT;
   end;
-  Winapi.Dwmapi.DwmSetWindowAttribute(TheHandle, DWMWA_WINDOW_CORNER_PREFERENCE, @DWM_WINDOW_CORNER_PREFERENCE, sizeof(DWM_WINDOW_CORNER_PREFERENCE));
- end;
+  DwmSetWindowAttribute(TheHandle, DWMWA_WINDOW_CORNER_PREFERENCE, @DWM_WINDOW_CORNER_PREFERENCE, sizeof(DWM_WINDOW_CORNER_PREFERENCE));
+end;
+
 end.
+

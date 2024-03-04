@@ -115,6 +115,10 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Controller\FactoryProce.pas"/>
+        <DCCReference Include="view\InventoryFrm.pas">
+            <Form>InvFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <None Include=".gitattributes"/>
         <None Include="DB\MarkDB.db"/>
