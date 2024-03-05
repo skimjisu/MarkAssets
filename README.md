@@ -1,11 +1,11 @@
-﻿[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fskimjisu&count_bg=%23FFD5D5&title_bg=%23FF7575&icon=&icon_color=%23E7E7E7&title=VISIT&edge_flat=false)](https://hits.seeyoufarm.com)
+⅝﻿[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fskimjisu&count_bg=%23FFD5D5&title_bg=%23FF7575&icon=&icon_color=%23E7E7E7&title=VISIT&edge_flat=false)](https://hits.seeyoufarm.com)
 # MarkAssets
 
 ## 소개
 MarkAssets는 Delphi 11.3 버전의 IDE에서 개발된 자산 관리 애플리케이션입니다.
 
 이 프로젝트의 목표는 사용자 친화적인 인터페이스와 효율적인 자산 관리 기능을 제공하여, 자산 관리를 더욱 쉽고 효율적으로 만드는 것입니다.
-데이터베이스 관리 시스템(DBMS)로는 SQLite를 사용하고 있습니다.
+데이터베이스 관리 시스템(DBMS)로는 관계형 데이터베이스인 Mysql을 사용하고 있습니다.
 
 ## 특징
 사용자 친화적인 인터페이스: 사용자의 편의를 최우선으로 고려한 인터페이스를 제공합니다.
