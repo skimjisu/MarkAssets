@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, FireDAC.Comp.Client, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, System.Hash,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, DBProce,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, DBProce, DataStruct,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, System.Classes, System.Variants,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.DApt, FireDAC.Comp.UI, windows, Vcl.Dialogs, Common;
 

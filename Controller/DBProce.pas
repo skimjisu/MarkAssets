@@ -3,9 +3,9 @@ unit DBProce;
 interface
 
 uses
-  Vcl.Forms, Windows , FireDAC.Phys.SQLite, IdHashMessageDigest, Dialogs, DateUtils, FireDAC.Stan.Pool,
+  Vcl.Forms, Windows , FireDAC.Phys.SQLite, IdHashMessageDigest, Dialogs, DateUtils, FireDAC.Stan.Pool, DataStruct,
   System.SysUtils, System.Classes, StrUtils,  Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.Controls, VCL.TMSFNCGridData, VCL.TMSFNCCustomGrid, VCL.TMSFNCGrid, VCL.TMSFNCGridDatabaseAdapter,
-  System.Hash, FireDAC.UI.Intf, FireDAC.Stan.Option, Data.DB, Common,
+  System.Hash, FireDAC.UI.Intf, FireDAC.Stan.Option, Data.DB, Common, System.Generics.Collections,
   FireDAC.Comp.Client, // FireDAC 컴포넌트
   FireDAC.Stan.Def,    // FireDAC 표준 정의
   FireDAC.Stan.Param,  // FireDAC 표준 파라미터
@@ -18,18 +18,18 @@ uses
   FireDAC.Phys.MySQL;  // FireDAC MySQL 드라이버
 type
   TDBProce = class
-
   private
       FDBConnection: TFDConnection;
       FDBManager: TFDManager;
       class var FInstance: TDBProce;
+      FMemTables: TDictionary<string, TFDMemTable>;
   public
-      class function GetInstance(const DBPath: string): TDBProce;
+      class function GetInstance : TDBProce;
       procedure StartTransaction;
       procedure Commit;
       procedure Rollback;
 
-      constructor Create(const DB_Name: string);
+      constructor Create;
       destructor Destroy; override;
       function GetDBConnection: TFDConnection;
       procedure InsertData(const TableName: string; const Fields: TStringList; const Values: TStringList);
@@ -37,32 +37,26 @@ type
       procedure UpdateData(const TableName, FieldName, OldValue, NewValue: string);
       procedure DeleteData(const TableName, FieldName, Value: string);
 
-      function HashPassword(const Password: string): string;
       function ValidateUser(const Username, PasswordHash: string): Boolean;
       function UserExists(const Username: string): Boolean;
       procedure CreateUser(const Username, Password: string);
       procedure LoadDataIntoFNCGrid(Grid: TTMSFNCGrid);
-
+      procedure ConnectTableToGrid(const TableName: string; const Grid: TTMSFNCGrid; const Adapter: TTMSFNCGridDatabaseAdapter);
     end;
 
 implementation
 
-var
-  FDBConnection: TFDConnection = nil;
+//var
+//  FDBConnection: TFDConnection = nil;
 
-class function TDBProce.GetInstance(const DBPath: string): TDBProce;
+class function TDBProce.GetInstance : TDBProce;
 begin
   if FInstance = nil then
-    FInstance := TDBProce.Create(DBPath);
+    FInstance := TDBProce.Create;
   Result := FInstance;
 end;
 
-function TDBProce.HashPassword(const Password: string): string;
-begin
-  Result := THashSHA2.GetHashString(Password, THashSHA2.TSHA2Version.SHA256);
-end;
-
-constructor TDBProce.Create(const DB_Name: string);
+constructor TDBProce.Create;
 var
   Params: TStringList;
 begin
@@ -70,7 +64,7 @@ begin
 
   Params := TStringList.Create;
   try
-    Params.Add('Database=' + DB_Name);
+    Params.Add('Database=' + DBName);
     Params.Add('DriverID=MySQL');
     Params.Add('Pooled=True');
     Params.Add('Pool_CleanupTimeout=60');
@@ -85,16 +79,16 @@ begin
   finally
     Params.Free;
   end;
-
+  FMemTables := TDictionary<string, TFDMemTable>.Create;
   FDBConnection := TFDConnection.Create(nil);
   FDBConnection.ConnectionDefName := 'MyConnection';
   FDBConnection.Connected := True;
-
 end;
 
 
 destructor TDBProce.Destroy;
 begin
+
   FDBConnection.Connected := False;
   FDBConnection.Free;
   FDBManager.Free;
@@ -105,6 +99,39 @@ function TDBProce.GetDBConnection: TFDConnection;
 begin
   Result := FDBConnection;
 end;
+
+procedure TDBProce.ConnectTableToGrid(const TableName: string; const Grid: TTMSFNCGrid; const Adapter: TTMSFNCGridDatabaseAdapter);
+var
+  FDQuery: TFDQuery;
+  FDMemTable: TFDMemTable;
+begin
+  FDQuery := TFDQuery.Create(nil);
+  try
+    FDQuery.Connection := FDBConnection;
+    FDQuery.SQL.Text := 'SELECT * FROM ' + TableName;
+    FDQuery.Open;
+
+    FDMemTable := TFDMemTable.Create(nil);
+    try
+      FDMemTable.Data := FDQuery.Data;
+      FMemTables.Add(TableName, FDMemTable);
+
+      Adapter.Active := False;
+      if Adapter.DataSource = nil then
+        Adapter.DataSource := TDataSource.Create(nil);  // DataSource 생성 및 초기화
+      Adapter.DataSource.DataSet := FDMemTable;
+      Adapter.Grid := Grid;
+      Grid.Adapter := Adapter;
+      Adapter.Active := True;
+    except
+      FDMemTable.Free;
+      raise;
+    end;
+  finally
+    FDQuery.Free;
+  end;
+end;
+
 
 function TDBProce.UserExists(const Username: string): Boolean;
 var

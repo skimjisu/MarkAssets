@@ -59,6 +59,7 @@
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
         <SanitizedProjectName>MarkAssets</SanitizedProjectName>
         <FeatureFilesAdded>SQLite</FeatureFilesAdded>
+        <Custom_Styles>&quot;Sienna Green Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SiennaGreenLight.vsf&quot;;&quot;Sienna Green Light LB|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SiennaGreenLightLB.vsf&quot;</Custom_Styles>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>vclwinx;DataSnapServer;FMXTMSFNCCorePkgDXE15;fmx;emshosting;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;FmxTeeUI;emsedge;bindcompfmx;TMSVCLUIPackPkgExDXE15;DBXFirebirdDriver;inetdb;ibmonitor;FireDACSqliteDriver;DbxClientDriver;FireDACASADriver;Tee;soapmidas;SVGIconImageListFMX;vclactnband;TeeUI;fmxFireDAC;dbexpress;FireDACInfxDriver;CEF4DelphiVCLRTL;DBXMySQLDriver;VclSmp;inet;DataSnapCommon;vcltouch;fmxase;DBXOdbcDriver;dbrtl;FireDACDBXDriver;FireDACOracleDriver;fmxdae;TeeDB;FireDACMSAccDriver;CustomIPTransport;FireDACMSSQLDriver;DataSnapIndy10ServerTransport;CEF4DelphiFMXRTL;DataSnapConnectors;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;IndySystem;FireDACTDataDriver;VCLTMSFNCUIPackPkgDXE15;vcldb;ibxbindings;vclFireDAC;bindcomp;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;IndyCore;RESTBackendComponents;dmvcframeworkDT;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;DataSnapClient;DataSnapProviderClient;adortl;TMSVCLUIPackPkgDXE15;DBXSybaseASEDriver;DBXDb2Driver;vclimg;DataSnapFireDAC;emsclientfiredac;FireDACPgDriver;FireDAC;FireDACDSDriver;inetdbxpress;xmlrtl;tethering;dmvcframeworkRT;ibxpress;bindcompvcl;dsnap;CloudService;DBXSybaseASADriver;DBXOracleDriver;FireDACDb2Driver;DBXInformixDriver;vclib;fmxobj;bindcompvclsmp;DataSnapNativeClient;FMXTee;VCLTMSFNCCorePkgDXE15;DatasnapConnectorsFreePascal;soaprtl;SVGIconImageList;FMXTMSFNCUIPackPkgDXE15;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -94,6 +95,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -101,28 +104,29 @@
         </DelphiCompile>
         <DCCReference Include="Controller\DBProce.pas"/>
         <DCCReference Include="Controller\LoginProce.pas"/>
-        <DCCReference Include="LoginUnit.pas">
+        <DCCReference Include="uLogin.pas">
             <Form>Loginfrm</Form>
         </DCCReference>
-        <DCCReference Include="MainUnit.pas">
+        <DCCReference Include="uMain.pas">
             <Form>Mainfrm</Form>
         </DCCReference>
         <DCCReference Include="Common.pas"/>
         <DCCReference Include="Controller\RoundProce.pas"/>
-        <DCCReference Include="view\DashboardFrm.pas">
+        <DCCReference Include="view\uDashboard.pas">
             <Form>DashbdFrm</Form>
         </DCCReference>
         <DCCReference Include="Controller\FactoryProce.pas"/>
-        <DCCReference Include="view\InventoryFrm.pas">
+        <DCCReference Include="view\uInventory.pas">
             <Form>InvFrm</Form>
         </DCCReference>
-        <DCCReference Include="view\AddInventoryFrm.pas">
+        <DCCReference Include="view\uAddInventory.pas">
             <Form>AddFrm</Form>
         </DCCReference>
         <DCCReference Include="Model\DataStruct.pas"/>
+        <DCCReference Include="model\uDataHandler.pas"/>
         <None Include="README.md"/>
         <None Include=".gitattributes"/>
-        <None Include="DB\MarkDB.db"/>
+        <None Include="DB\MarkDB.sql"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -143,6 +147,12 @@
                 <Source>
                     <Source Name="MainSource">MarkAssets.dpr</Source>
                 </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k280.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp280.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName=".gitattributes" Configuration="Release" Class="ProjectFile">
@@ -151,7 +161,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="DB\MarkDB.db" Configuration="Release" Class="ProjectFile">
+                <DeployFile LocalName="DB\MarkDB.sql" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

@@ -3,7 +3,7 @@ unit FactoryProce;
 interface
 
 uses
-  Vcl.Controls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Forms, System.Classes, DashboardFrm, InventoryFrm;
+  Vcl.Controls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Forms, System.Classes, uDashboard, uInventory;
 
 type
   TControlFactory = class
