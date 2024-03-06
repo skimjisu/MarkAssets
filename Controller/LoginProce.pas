@@ -3,40 +3,37 @@ unit LoginProce;
 interface
 
 uses
-  System.SysUtils, FireDAC.Comp.Client, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
-  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
-  FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, DBProce, FireDAC.DApt, FireDAC.Comp.UI, windows, Vcl.Dialogs, Common;
-
+  System.SysUtils, FireDAC.Comp.Client, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, System.Hash,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, DBProce,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, System.Classes, System.Variants,
+  FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.DApt, FireDAC.Comp.UI, windows, Vcl.Dialogs, Common;
 
 type
-  TLoginEvent = procedure(Sender: TObject; Success: Boolean) of object;
-
-  TLoginControl = class
+  TLoginEvent = procedure(Sender: TObject; const Username: string; const IsSuccess: Boolean) of object;
+  TLoginControl = class(TComponent)
   private
-    FOnLogin: TLoginEvent;
-    FUsername: string;
-    FPassword: string;
-    FAuthorityLevel: string;
-    FConnection: TFDConnection;
-    function IsAuthenticated: Boolean;
-
+    FDBProce: TDBProce;
+    FOnLoginSuccess: TLoginEvent;
+    FOnLoginFailure: TLoginEvent;
+    FFields, FValues : TStringList;
+    FLoggedUser: string;
   public
-    constructor Create(const Username, Password: string);
+    constructor Create(DBProce: TDBProce);
     destructor Destroy; override;
-    procedure CreateAccount;
-    procedure Login;
-    function GetLoggedUser: string;
-    property OnLogin: TLoginEvent read FOnLogin write FOnLogin;
+    procedure Login(const Username, Password: string);
+    property OnLoginSuccess: TLoginEvent read FOnLoginSuccess write FOnLoginSuccess;
+    property OnLoginFailure: TLoginEvent read FOnLoginFailure write FOnLoginFailure;
+    function ValidateUser(const Username, Password: string): Boolean;
+    procedure CreateUser(const Username, Password: string);
+  published
+
   end;
 
 implementation
 
-constructor TLoginControl.Create(const Username, Password: string);
+constructor TLoginControl.Create(DBProce: TDBProce);
 begin
-  FUsername := Username;
-  FPassword := Password;
-  FConnection := GetDBConnection;
+  FDBProce := DBProce;
 end;
 
 destructor TLoginControl.Destroy;
@@ -44,89 +41,33 @@ begin
   inherited;
 end;
 
-function TLoginControl.IsAuthenticated: Boolean;
+procedure TLoginControl.Login(const Username, Password: string);
 var
-  Query: TFDQuery;
+  IsSuccess: Boolean;
 begin
-  Query := TFDQuery.Create(nil);
-  try
-    Query.Connection := FConnection;
-    Query.SQL.Text := 'SELECT * FROM Admins WHERE Username = :Username AND Password = :Password'; // 'Users'를 'Admins'로 변경
-    Query.ParamByName('Username').AsString := FUsername;
-    Query.ParamByName('Password').AsString := HashPassword(FPassword);
-    Query.Open;
-    Result := not Query.IsEmpty;
+  IsSuccess := FDBProce.ValidateUser(Username, THashSHA2.GetHashString(Password, THashSHA2.TSHA2Version.SHA256));
 
-    if Result then
-    begin
-      // 로그인에 성공하면 authority_level 값을 가져옵니다.
-      FAuthorityLevel := Query.FieldByName('authority_level').AsString;
-      LoggedUser := FUsername;
-    end;
-  finally
-    Query.Free;
+  if IsSuccess then
+  begin
+    if Assigned(FOnLoginSuccess) then
+      FOnLoginSuccess(Self, Username, IsSuccess);
+  end
+  else
+  begin
+    if Assigned(FOnLoginFailure) then
+      FOnLoginFailure(Self, Username, IsSuccess);
   end;
 end;
 
-procedure TLoginControl.CreateAccount;
-var
-  Query: TFDQuery;
+function TLoginControl.ValidateUser(const Username, Password: string): Boolean;
 begin
-  Query := TFDQuery.Create(nil);
-  try
-    Query.Connection := FConnection;
-    Query.SQL.Text := 'INSERT INTO Admins (Username, Password, authority_level) VALUES (:Username, :Password, :authority_level)';
-    Query.ParamByName('Username').AsString := FUsername;
-    Query.ParamByName('Password').AsString := HashPassword(FPassword);
-    Query.ParamByName('authority_level').AsString := '모두';
-    Query.ExecSQL;
-  finally
-    Query.Free;
-  end;
+  Result := FDBProce.ValidateUser(Username, THashSHA2.GetHashString(Password, THashSHA2.TSHA2Version.SHA256));
 end;
 
-function TLoginControl.GetLoggedUser: string;
+procedure TLoginControl.CreateUser(const Username, Password: string);
 begin
-  // 로그인 성공 후에 사용자 이름이 g_UserName에 저장되었다고 가정
-  Result := LoggedUser;
+  FDBProce.CreateUser(Username, THashSHA2.GetHashString(Password, THashSHA2.TSHA2Version.SHA256));
 end;
-
-
-procedure TLoginControl.Login;
-var
-  WaitCursor: TFDGUIxWaitCursor;
-  Success: Boolean;
-
-begin
-  WaitCursor := TFDGUIxWaitCursor.Create(nil);
-  try
-    WaitCursor.Provider := 'Forms';  // Provider 설정
-
-    // 로그인 처리
-    try
-      Success := IsAuthenticated;
-
-      if Success then
-      begin
-
-        if Assigned(FOnLogin) then FOnLogin(Self, Success);
-      end
-      else
-      begin
-        CreateAccount;
-        ShowMessage('계정이 생성되었습니다. 다시 로그인 해주세요.');
-      end;
-    except
-      on E: Exception do
-         MessageBox(0, PChar('로그인 처리 중 에러가 발생했습니다: ' + E.Message), PChar('경고'), MB_ICONWARNING or MB_OK);
-      //  ShowMessage('로그인 처리 중 에러가 발생했습니다: ' + E.Message);
-    end;
-
-  finally
-    WaitCursor.Free;
-  end;
-end;
-
 
 end.
 

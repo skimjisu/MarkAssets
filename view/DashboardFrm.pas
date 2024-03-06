@@ -61,6 +61,8 @@ type
     Panel3: TPanel;
     Timer: TTimer;
     VirtualImageList1: TVirtualImageList;
+    Memo1: TMemo;
+    Memo2: TMemo;
   private
     { Private declarations }
   public

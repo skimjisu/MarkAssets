@@ -20,7 +20,7 @@ object Loginfrm: TLoginfrm
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 273
+    ExplicitWidth = 270
     ExplicitHeight = 301
     object Panel2: TPanel
       Left = 0
@@ -30,7 +30,7 @@ object Loginfrm: TLoginfrm
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitWidth = 273
+      ExplicitWidth = 270
       object VirtualImage1: TVirtualImage
         Left = 88
         Top = 16
@@ -50,7 +50,7 @@ object Loginfrm: TLoginfrm
       BevelOuter = bvNone
       Caption = 'Panel3'
       TabOrder = 1
-      ExplicitWidth = 273
+      ExplicitWidth = 270
       ExplicitHeight = 173
       object LoginButton: TSpeedButton
         Left = 8

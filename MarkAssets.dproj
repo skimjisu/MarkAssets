@@ -106,19 +106,20 @@
         </DCCReference>
         <DCCReference Include="MainUnit.pas">
             <Form>Mainfrm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Common.pas"/>
         <DCCReference Include="Controller\RoundProce.pas"/>
         <DCCReference Include="view\DashboardFrm.pas">
             <Form>DashbdFrm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Controller\FactoryProce.pas"/>
         <DCCReference Include="view\InventoryFrm.pas">
             <Form>InvFrm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="view\AddInventoryFrm.pas">
+            <Form>AddFrm</Form>
+        </DCCReference>
+        <DCCReference Include="Model\DataStruct.pas"/>
         <None Include="README.md"/>
         <None Include=".gitattributes"/>
         <None Include="DB\MarkDB.db"/>

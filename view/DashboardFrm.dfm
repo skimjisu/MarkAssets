@@ -946,10 +946,29 @@ object DashbdFrm: TDashbdFrm
             TabOrder = 1
           end
         end
+        object Memo1: TMemo
+          Left = 416
+          Top = 152
+          Width = 185
+          Height = 89
+          Lines.Strings = (
+            'Memo1')
+          TabOrder = 11
+        end
       end
       object TabSheet2: TTabSheet
         Caption = 'Details'
         ImageIndex = 1
+        object Memo2: TMemo
+          Left = 0
+          Top = 0
+          Width = 1011
+          Height = 391
+          Align = alClient
+          Lines.Strings = (
+            'Memo2')
+          TabOrder = 0
+        end
       end
     end
   end

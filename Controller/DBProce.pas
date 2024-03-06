@@ -3,212 +3,351 @@ unit DBProce;
 interface
 
 uses
-  Windows , FireDAC.Comp.Client, Data.DB, FireDAC.Phys.SQLite, IdHashMessageDigest, Dialogs, System.SysUtils, Classes, StrUtils;
-function CreateDBConnection: TFDConnection;
-function HashPassword(const Password: string): string;
-function GetDBConnection: TFDConnection;
-procedure UpdateInventoryFromCSV(const CSVFileName: string);
+  Vcl.Forms, Windows , FireDAC.Phys.SQLite, IdHashMessageDigest, Dialogs, DateUtils, FireDAC.Stan.Pool,
+  System.SysUtils, System.Classes, StrUtils,  Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.Controls, VCL.TMSFNCGridData, VCL.TMSFNCCustomGrid, VCL.TMSFNCGrid, VCL.TMSFNCGridDatabaseAdapter,
+  System.Hash, FireDAC.UI.Intf, FireDAC.Stan.Option, Data.DB, Common,
+  FireDAC.Comp.Client, // FireDAC 컴포넌트
+  FireDAC.Stan.Def,    // FireDAC 표준 정의
+  FireDAC.Stan.Param,  // FireDAC 표준 파라미터
+  FireDAC.Stan.Error,  // FireDAC 표준 에러 핸들링
+  FireDAC.DatS,        // FireDAC 데이터셋
+  FireDAC.Phys.Intf,   // FireDAC 물리적 인터페이스
+  FireDAC.DApt.Intf,   // FireDAC 데이터 어댑터 인터페이스
+  FireDAC.Stan.Async,  // FireDAC 비동기 처리
+  FireDAC.DApt,        // FireDAC 데이터 어댑터
+  FireDAC.Phys.MySQL;  // FireDAC MySQL 드라이버
+type
+  TDBProce = class
+
+  private
+      FDBConnection: TFDConnection;
+      FDBManager: TFDManager;
+      class var FInstance: TDBProce;
+  public
+      class function GetInstance(const DBPath: string): TDBProce;
+      procedure StartTransaction;
+      procedure Commit;
+      procedure Rollback;
+
+      constructor Create(const DB_Name: string);
+      destructor Destroy; override;
+      function GetDBConnection: TFDConnection;
+      procedure InsertData(const TableName: string; const Fields: TStringList; const Values: TStringList);
+      function ReadData(const TableName, FieldName: string): TStringList;
+      procedure UpdateData(const TableName, FieldName, OldValue, NewValue: string);
+      procedure DeleteData(const TableName, FieldName, Value: string);
+
+      function HashPassword(const Password: string): string;
+      function ValidateUser(const Username, PasswordHash: string): Boolean;
+      function UserExists(const Username: string): Boolean;
+      procedure CreateUser(const Username, Password: string);
+      procedure LoadDataIntoFNCGrid(Grid: TTMSFNCGrid);
+
+    end;
 
 implementation
 
 var
   FDBConnection: TFDConnection = nil;
 
-function CreateDBConnection: TFDConnection;
+class function TDBProce.GetInstance(const DBPath: string): TDBProce;
 begin
-   Result := TFDConnection.Create(nil);
-  try
-    Result.DriverName := 'SQLite';
-    Result.Params.Values['Database'] := 'C:\Users\KDHS\Desktop\MarkAssets\MarkAssets\DB\MarkDB.db';  // 데이터베이스 파일 경로 수정해주세요.
-    Result.Connected := True;
-    //ShowMessage('데이터베이스 연결 성공!');
-  except
-    on E: Exception do
-    begin
-      MessageBox(0, PChar('데이터베이스 연결 실패: ' + E.Message), PChar('경고'), MB_ICONWARNING or MB_OK);
-      FreeAndNil(Result);
-    end;
-  end;
+  if FInstance = nil then
+    FInstance := TDBProce.Create(DBPath);
+  Result := FInstance;
 end;
 
-function HashPassword(const Password: string): string;
+function TDBProce.HashPassword(const Password: string): string;
+begin
+  Result := THashSHA2.GetHashString(Password, THashSHA2.TSHA2Version.SHA256);
+end;
+
+constructor TDBProce.Create(const DB_Name: string);
 var
-  idmd5: TIdHashMessageDigest5;
+  Params: TStringList;
 begin
-  idmd5 := TIdHashMessageDigest5.Create;
+  FDBManager := TFDManager.Create(nil);
+
+  Params := TStringList.Create;
   try
-    Result := idmd5.HashStringAsHex(Password);
+    Params.Add('Database=' + DB_Name);
+    Params.Add('DriverID=MySQL');
+    Params.Add('Pooled=True');
+    Params.Add('Pool_CleanupTimeout=60');
+    Params.Add('Pool_ExpireTimeout=600');
+    Params.Add('Pool_MaximumItems=50');
+    Params.Add('Pool_MinimumItems=5');
+    Params.Add('User_Name=admin'); // MySQL 사용자 이름
+    Params.Add('Password=1234'); // MySQL 비밀번호
+    Params.Add('Server=127.0.0.1'); // MySQL 서버 주소
+
+    FDBManager.AddConnectionDef('MyConnection', 'MySQL', Params);
   finally
-    idmd5.Free;
+    Params.Free;
   end;
+
+  FDBConnection := TFDConnection.Create(nil);
+  FDBConnection.ConnectionDefName := 'MyConnection';
+  FDBConnection.Connected := True;
+
 end;
 
-function GetDBConnection: TFDConnection;
+
+destructor TDBProce.Destroy;
 begin
-  if not Assigned(FDBConnection) then
-    FDBConnection := CreateDBConnection;
+  FDBConnection.Connected := False;
+  FDBConnection.Free;
+  FDBManager.Free;
+  inherited;
+end;
+
+function TDBProce.GetDBConnection: TFDConnection;
+begin
   Result := FDBConnection;
 end;
 
-procedure CreateInvDB(const ID: Integer; const AssetCode, ModelName, SerialNumber, Manufacturer, EneDate, aType: string);
+function TDBProce.UserExists(const Username: string): Boolean;
 var
   Query: TFDQuery;
 begin
-  Query := TFDQuery.Create(nil);
+  Query := TFDQuery.Create(FDBConnection);
   try
-    Query.Connection := GetDBConnection;
-    Query.SQL.Text := 'INSERT INTO Inventory (ID, AssetCode, ModelName, SerialNumber, Manufacturer, EneDate, Type) VALUES (:ID, :AssetCode, :ModelName, :SerialNumber, :Manufacturer, :EneDate, :Type)';
-    Query.ParamByName('ID').AsInteger := ID;
-    Query.ParamByName('AssetCode').AsString := AssetCode;
-    Query.ParamByName('ModelName').AsString := ModelName;
-    Query.ParamByName('SerialNumber').AsString := SerialNumber;
-    Query.ParamByName('Manufacturer').AsString := Manufacturer;
-    Query.ParamByName('EneDate').AsString := EneDate;
-    Query.ParamByName('Type').AsString := aType;
-    Query.ExecSQL;
-  finally
-    Query.Free;
-  end;
-end;
-
-function ReadInvDB(const ID: Integer): TDataSet;
-var
-  Query: TFDQuery;
-begin
-  Query := TFDQuery.Create(nil);
-  try
-    Query.Connection := GetDBConnection;
-    Query.SQL.Text := 'SELECT * FROM Inventory WHERE ID = :ID';
-    Query.ParamByName('ID').AsInteger := ID;
+    Query.Connection := FDBConnection;
+    Query.SQL.Text := 'SELECT COUNT(*) FROM Admins WHERE Username = :username';
+    Query.ParamByName('username').AsString := Username;
     Query.Open;
-    Result := Query;
-  except
-    on E: Exception do
- begin
-      FreeAndNil(Query);
-      raise;
-    end;
-  end;
-end;
-
-procedure UpdateInvDB(const ID: Integer; const AssetCode, ModelName, SerialNumber, Manufacturer, EneDate, aType: string);
-var
-  Query: TFDQuery;
-begin
-  Query := TFDQuery.Create(nil);
-  try
-    Query.Connection := GetDBConnection;
-    Query.SQL.Text := 'UPDATE Inventory SET AssetCode = :AssetCode, ModelName = :ModelName, SerialNumber = :SerialNumber, Manufacturer = :Manufacturer, EneDate = :EneDate, Type = :Type WHERE ID = :ID';
-    Query.ParamByName('ID').AsInteger := ID;
-    Query.ParamByName('AssetCode').AsString := AssetCode;
-    Query.ParamByName('ModelName').AsString := ModelName;
-    Query.ParamByName('SerialNumber').AsString := SerialNumber;
-    Query.ParamByName('Manufacturer').AsString := Manufacturer;
-    Query.ParamByName('EneDate').AsString := EneDate;
-    Query.ParamByName('Type').AsString := aType;
-    Query.ExecSQL;
+    Result := Query.Fields[0].AsInteger > 0;
   finally
     Query.Free;
   end;
 end;
 
-procedure DeleteInvDB(const ID: Integer);
+procedure TDBProce.InsertData(const TableName: string; const Fields: TStringList; const Values: TStringList);
 var
-  Query: TFDQuery;
-begin
-  Query := TFDQuery.Create(nil);
-  try
-    Query.Connection := GetDBConnection;
-    Query.SQL.Text := 'DELETE FROM Inventory WHERE ID = :ID';
-    Query.ParamByName('ID').AsInteger := ID;
-    Query.ExecSQL;
-  finally
-    Query.Free;
-  end;
-end;
-
-procedure UpdateInventoryFromCSV(const CSVFileName: string);
-var
-  CSVFile: TextFile;
-  Line: string;
-  Parts: TStringList;
   FDQuery: TFDQuery;
-  LineNumber: Integer;
+  SQL, FieldsStr, ValuesStr: string;
+  I: Integer;
 begin
-  FDQuery := TFDQuery.Create(nil);
+  FDBConnection.StartTransaction;
   try
-    FDQuery.Connection := GetDBConnection;
-
-    Parts := TStringList.Create;
+    FDQuery := TFDQuery.Create(nil);
     try
-      AssignFile(CSVFile, CSVFileName);
-      Reset(CSVFile);
+      FDQuery.Connection := FDBConnection;
 
-      LineNumber := 0;
-      while not Eof(CSVFile) do
+      FieldsStr := '';
+      ValuesStr := '';
+      for I := 0 to Fields.Count - 1 do
       begin
-        Inc(LineNumber);
-        ReadLn(CSVFile, Line);
-
-        Parts.Clear;
-        ExtractStrings([','], [], PChar(Line), Parts);  // Assuming fields are comma-separated
-
-        // Check if the row has the correct number of columns
-        if Parts.Count <> 6 then
+        FieldsStr := FieldsStr + Fields.Strings[I];
+        ValuesStr := ValuesStr + QuotedStr(Values.Strings[I]);
+        if I < Fields.Count - 1 then
         begin
-          // If the row is invalid, log the line number and skip this row
-          WriteLn('Invalid row at line ' + IntToStr(LineNumber));
-          Continue;
-        end;
-
-        FDQuery.SQL.Text := 'UPDATE Inventory SET Type = :Type, ModelName = :ModelName, Contract = :Contract, EneDate = :EneDate WHERE AssetCode = :AssetCode AND SerialNumber = :SerialNumber';
-
-        FDQuery.ParamByName('AssetCode').AsString := Parts[0];
-        FDQuery.ParamByName('SerialNumber').AsString := Parts[1];
-
-        if Parts[2] <> '' then
-          FDQuery.ParamByName('Type').AsString := Parts[2]
-        else
-          FDQuery.ParamByName('Type').Clear;
-
-        if Parts[3] <> '' then
-          FDQuery.ParamByName('ModelName').AsString := Parts[3]
-        else
-          FDQuery.ParamByName('ModelName').Clear;
-
-        if Parts[4] <> '' then
-          FDQuery.ParamByName('Contract').AsString := Parts[4]
-        else
-          FDQuery.ParamByName('Contract').Clear;
-
-        if Parts[5] <> '' then
-          FDQuery.ParamByName('EneDate').AsString := Parts[5]
-        else
-          FDQuery.ParamByName('EneDate').Clear;
-
-        try
-          FDQuery.ExecSQL;  // Execute the update
-        except
-          on E: Exception do
-          begin
-            // If there's an error updating the row, log the line number and error message
-            WriteLn('Error at line ' + IntToStr(LineNumber) + ': ' + E.Message);
-          end;
+          FieldsStr := FieldsStr + ', ';
+          ValuesStr := ValuesStr + ', ';
         end;
       end;
-    finally
-      Parts.Free;
-    end;
 
-    CloseFile(CSVFile);
+      SQL := Format('INSERT INTO %s (%s) VALUES (%s);', [TableName, FieldsStr, ValuesStr]);
+      FDQuery.SQL.Text := SQL;
+      FDQuery.ExecSQL;
+    finally
+      FDQuery.Free;
+    end;
+    FDBConnection.Commit;
+  except
+    FDBConnection.Rollback;
+    raise;
+  end;
+end;
+
+function TDBProce.ReadData(const TableName, FieldName: string): TStringList;
+var
+  FDQuery: TFDQuery;
+  SQL: string;
+begin
+  Result := TStringList.Create;
+
+  FDQuery := TFDQuery.Create(nil);
+  try
+    FDQuery.Connection := FDBConnection;
+
+    FDBConnection.StartTransaction;
+    try
+      SQL := Format('SELECT %s FROM %s;', [FieldName, TableName]);
+      FDQuery.SQL.Text := SQL;
+      FDQuery.Open;
+
+      while not FDQuery.Eof do
+      begin
+        Result.Add(FDQuery.FieldByName(FieldName).AsString);
+        FDQuery.Next;
+      end;
+
+      FDBConnection.Commit;
+    except
+      FDBConnection.Rollback;
+      raise;
+    end;
   finally
     FDQuery.Free;
   end;
 end;
 
+procedure TDBProce.UpdateData(const TableName, FieldName, OldValue, NewValue: string);
+var
+  FDQuery: TFDQuery;
+  SQL: string;
+begin
+  FDQuery := TFDQuery.Create(nil);
+  try
+    FDQuery.Connection := FDBConnection;
+
+    FDBConnection.StartTransaction;
+    try
+      SQL := Format('UPDATE %s SET %s = :NewValue WHERE %s = :OldValue;', [TableName, FieldName, FieldName]);
+      FDQuery.SQL.Text := SQL;
+      FDQuery.ParamByName('NewValue').AsString := NewValue;
+      FDQuery.ParamByName('OldValue').AsString := OldValue;
+      FDQuery.ExecSQL;
+
+      FDBConnection.Commit;
+    except
+      FDBConnection.Rollback;
+      raise;
+    end;
+  finally
+    FDQuery.Free;
+  end;
+end;
+
+procedure TDBProce.DeleteData(const TableName, FieldName, Value: string);
+var
+  FDQuery: TFDQuery;
+  SQL: string;
+begin
+  FDQuery := TFDQuery.Create(nil);
+  try
+    FDQuery.Connection := FDBConnection;
+
+    FDBConnection.StartTransaction;
+    try
+      SQL := Format('DELETE FROM %s WHERE %s = :Value;', [TableName, FieldName]);
+      FDQuery.SQL.Text := SQL;
+      FDQuery.ParamByName('Value').AsString := Value;
+      FDQuery.ExecSQL;
+
+      FDBConnection.Commit;
+    except
+      FDBConnection.Rollback;
+      raise;
+    end;
+  finally
+    FDQuery.Free;
+  end;
+end;
+
+// 사용자 계정을 데이터베이스에 생성하는 메소드
+procedure TDBProce.CreateUser(const Username, Password: string);
+var
+  Query: TFDQuery;
+begin
+  Query := TFDQuery.Create(FDBConnection);
+  try
+    Query.Connection := FDBConnection;
+    Query.SQL.Text := 'INSERT INTO Admins (Username, Password, authority_level) VALUES (:Username, :Password, :authority_level)';
+    Query.ParamByName('Username').AsString := Username;
+    Query.ParamByName('Password').AsString := Password;
+    Query.ParamByName('authority_level').AsString := '모두';
+    Query.ExecSQL;
+  finally
+    Query.Free;
+  end;
+end;
+
+// 사용자의 유효성을 검증하는 메소드
+function TDBProce.ValidateUser(const Username, PasswordHash: string): Boolean;
+var
+  Query: TFDQuery;
+begin
+  Result := False;
+
+  Query := TFDQuery.Create(FDBConnection);
+  try
+    Query.Connection := FDBConnection;
+    Query.SQL.Text := 'SELECT Password FROM Admins WHERE Username = :Username';
+    Query.ParamByName('Username').AsString := Username;
+    Query.Open;
+
+    if not Query.Eof then
+    begin
+      Result := Query.FieldByName('Password').AsString = PasswordHash;
+    end;
+  finally
+    Query.Free;
+  end;
+end;
+
+procedure TDBProce.LoadDataIntoFNCGrid(Grid: TTMSFNCGrid);
+var
+  Query: TFDQuery;
+  MemTable: TFDMemTable;
+  DataSource: TDataSource;
+  GridData: TTMSFNCGridDatabaseAdapter;
+begin
+  Query := TFDQuery.Create(nil);
+  MemTable := TFDMemTable.Create(nil);
+  DataSource := TDataSource.Create(nil);
+  GridData := TTMSFNCGridDatabaseAdapter.Create(nil);
+
+  try
+    Query.Connection := FDBConnection;
+    Query.SQL.Text := 'SELECT AssetCode, SerialNumber, Type, ModelName, Contract, EndDate FROM Inventory';  // 쿼리 수정
+    Query.Open;
+
+    MemTable.Data := Query.Data;
+    DataSource.DataSet := MemTable;
+
+    GridData.DataSource := DataSource;
+    GridData.Active := True;
+
+    Grid.BeginUpdate;
+    try
+      Grid.Adapter := GridData;
+      Grid.AutoSizeColumns();
+    finally
+      Grid.EndUpdate;
+      Application.ProcessMessages;
+      Grid.Invalidate;
+    end;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('데이터 로드 중 에러 발생: ' + E.Message);
+    end;
+  end;
+end;
+
+procedure TDBProce.StartTransaction;
+begin
+  FDBConnection.StartTransaction;
+end;
+
+procedure TDBProce.Commit;
+begin
+  FDBConnection.Commit;
+end;
+
+procedure TDBProce.Rollback;
+begin
+  FDBConnection.Rollback;
+end;
+
 initialization
+  TDBProce.FInstance := nil;
 
 finalization
-  FDBConnection.Free;
+  TDBProce.FInstance.Free;
+
+
 
 end.

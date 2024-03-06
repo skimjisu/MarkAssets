@@ -33,7 +33,6 @@ type
     PagePanel: TPanel;
    // Panel1: TPanel;
     procedure FormCreate(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure Panel1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -45,9 +44,13 @@ type
     procedure Label4Click(Sender: TObject);
     procedure MenuClick(Sender: TObject);
     procedure Panel1DblClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+
   private
     FPageControl: TPageControl;
+    FDBProce: TDBProce;
     procedure CreateFormInTab(TabCaption: string; FormClass: TFormClass);
+    procedure CreateInventoryFormAndLoadData;
   public
    //
   public
@@ -57,7 +60,7 @@ type
 
 var
   Mainfrm: TMainfrm;
-
+  DashbdFrm: TDashbdFrm;
 implementation
 
 {$R *.dfm}
@@ -101,10 +104,16 @@ begin
   end;
 end;
 
-
-procedure TMainfrm.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TMainfrm.CreateInventoryFormAndLoadData;
+var
+  InventoryForm: TInvFrm;
 begin
-  //Action := caFree;
+  // Get the instance of InventoryForm
+  InventoryForm := TInvFrm(FPageControl.ActivePage.Controls[0]);
+
+  // Using TDBProce to load data into the grid
+  if Assigned(InventoryForm.TMSFNCGrid1) then
+    TDBProce.GetInstance(DB_Name).LoadDataIntoFNCGrid(InventoryForm.TMSFNCGrid1);
 end;
 
 procedure TMainFrm.CreateFormInTab(TabCaption: string; FormClass: TFormClass);
@@ -116,7 +125,7 @@ begin
   TControlFactory.CreateAndSetupForm(TabSheet, FormClass);
 
   for i := 0 to FPageControl.PageCount - 1 do
-  FPageControl.Pages[i].TabVisible := False;
+    FPageControl.Pages[i].TabVisible := False;
 end;
 
 procedure TMainfrm.FormCreate(Sender: TObject);
@@ -129,7 +138,16 @@ begin
   // Create forms in tabs
   CreateFormInTab('Dashboard', TDashbdFrm);
   CreateFormInTab('Inventory', TInvFrm);
+  // Process messages to complete the creation and initialization of the forms
+  Application.ProcessMessages;
+
+  // Then set the active page index
   FPageControl.ActivePageIndex := 0;
+end;
+
+procedure TMainfrm.FormDestroy(Sender: TObject);
+begin
+  FDBProce.Free;
 end;
 
 procedure TMainFrm.MenuClick(Sender: TObject);
@@ -148,6 +166,7 @@ begin
     FPageControl.ActivePageIndex := lb.Tag - 1;
   end;
 end;
+
 
 procedure TMainfrm.FormShow(Sender: TObject);
 begin
@@ -191,7 +210,7 @@ end;
 
 procedure TMainfrm.SpeedButton2Click(Sender: TObject);
 begin
-  UpdateInventoryFromCSV('C:\Users\KDHS\Downloads\1234.csv');
+ // ImportCSVIntoDB('C:\Users\KDHS\Downloads\1234.csv');
 end;
 
 end.

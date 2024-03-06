@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, VCL.TMSFNCTypes, VCL.TMSFNCUtils, VCL.TMSFNCGraphics, VCL.TMSFNCGraphicsTypes, VCL.TMSFNCCustomControl, VCL.TMSFNCCustomPicker,
-  VCL.TMSFNCComboBox, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons;
+  VCL.TMSFNCComboBox, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons, DBProce, Common;
 
 type
   TAddFrm = class(TForm)
@@ -23,28 +23,29 @@ type
     Panel2: TPanel;
     ProductName_pn: TPanel;
     Shape1: TShape;
-    Edit1: TEdit;
+    AessetEdit: TEdit;
     ProductPrice_pn: TPanel;
     Shape2: TShape;
-    Edit2: TEdit;
+    SerialEdit: TEdit;
     Panel4: TPanel;
     Shape3: TShape;
-    Edit3: TEdit;
+    ModelEdit: TEdit;
     Panel5: TPanel;
     Shape4: TShape;
     Edit4: TEdit;
     Panel3: TPanel;
-    TMSFNCComboBox1: TTMSFNCComboBox;
-    SpeedButton3: TSpeedButton;
+    TypeCombo: TTMSFNCComboBox;
     Label6: TLabel;
     Panel6: TPanel;
     Shape5: TShape;
-    Edit5: TEdit;
+    ContractEdit: TEdit;
     Label7: TLabel;
     Panel7: TPanel;
     Shape6: TShape;
-    Edit6: TEdit;
-    procedure SpeedButton3Click(Sender: TObject);
+    EndDateEdit: TEdit;
+
+    procedure pnl_TopMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure SpeedButton2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -58,9 +59,15 @@ implementation
 
 {$R *.dfm}
 
-procedure TAddFrm.SpeedButton3Click(Sender: TObject);
+procedure TAddFrm.pnl_TopMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 begin
-  close;
+  ReleaseCapture;
+  SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+end;
+
+procedure TAddFrm.SpeedButton2Click(Sender: TObject);
+begin
+  close
 end;
 
 end.
