@@ -3,7 +3,7 @@ unit uMain;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.ComCtrls, FactoryProce, uInventory, DataStruct,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.ComCtrls, uFactory, uInventory, DataStruct,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Grids, Vcl.Imaging.pngimage, Vcl.Buttons, LoginProce, Common, RoundProce, uDashboard, DBProce,
   System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection;
 
@@ -11,18 +11,18 @@ type
   TMainfrm = class(TForm)
     MenuPanel: TPanel;
     Customer_Img: TImage;
-    Label3: TLabel;
+    Customer_lb: TLabel;
     Inv_Img: TImage;
-    Label4: TLabel;
-    Label5: TLabel;
+    Inv_lb: TLabel;
+    Nil_lb: TLabel;
     History_Img: TImage;
-    Label6: TLabel;
+    History_lb: TLabel;
     Status_Img: TImage;
-    Label7: TLabel;
+    Status_lb: TLabel;
     Set_Img: TImage;
-    Label8: TLabel;
+    Service_lb: TLabel;
     Dash_Img: TImage;
-    Label10: TLabel;
+    Dash_lb: TLabel;
     BarPanel: TPanel;
     UserBtn: TSpeedButton;
     NameLB: TLabel;

@@ -166,7 +166,7 @@ object Mainfrm: TMainfrm
       ExplicitTop = 577
       ExplicitWidth = 114
     end
-    object Label3: TLabel
+    object Customer_lb: TLabel
       Tag = 5
       AlignWithMargins = True
       Left = 3
@@ -213,7 +213,7 @@ object Mainfrm: TMainfrm
       OnMouseLeave = ChangeLabelOnMouseLeave
       ExplicitWidth = 65
     end
-    object Label4: TLabel
+    object Inv_lb: TLabel
       Tag = 2
       AlignWithMargins = True
       Left = 3
@@ -234,7 +234,7 @@ object Mainfrm: TMainfrm
       ExplicitTop = 197
       ExplicitWidth = 78
     end
-    object Label5: TLabel
+    object Nil_lb: TLabel
       Left = 0
       Top = 0
       Width = 57
@@ -280,7 +280,7 @@ object Mainfrm: TMainfrm
         01F508CEB0781018830000000049454E44AE426082}
       ExplicitTop = 271
     end
-    object Label6: TLabel
+    object History_lb: TLabel
       Tag = 3
       AlignWithMargins = True
       Left = 3
@@ -319,7 +319,7 @@ object Mainfrm: TMainfrm
       ExplicitTop = 241
       ExplicitWidth = 114
     end
-    object Label7: TLabel
+    object Status_lb: TLabel
       Tag = 2
       AlignWithMargins = True
       Left = 3
@@ -428,7 +428,7 @@ object Mainfrm: TMainfrm
       ExplicitTop = 465
       ExplicitWidth = 114
     end
-    object Label8: TLabel
+    object Service_lb: TLabel
       Tag = 4
       AlignWithMargins = True
       Left = 3
@@ -475,7 +475,7 @@ object Mainfrm: TMainfrm
       ExplicitTop = 129
       ExplicitWidth = 114
     end
-    object Label10: TLabel
+    object Dash_lb: TLabel
       Tag = 1
       AlignWithMargins = True
       Left = 3
