@@ -3,7 +3,7 @@ unit uLogin;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, System.Hash, DataStruct, RoundProce,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, System.Hash, DataStruct, RoundProce, uDBConnect,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.VirtualImage, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls, LoginProce, FireDAC.UI.Intf, FireDAC.VCLUI.Wait, FireDAC.Stan.Intf,
   FireDAC.Comp.UI, DBProce, uMain, Vcl.Imaging.pngimage, Vcl.BaseImageCollection, Vcl.ImageCollection, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList;
 
@@ -29,6 +29,7 @@ type
   private
     { Private declarations }
     FDBProce: TDBProce;
+    //FConnectInfo: TConnectInfo;
     procedure LoginSuccess(Sender: TObject; const Username: string; const IsSuccess: Boolean);
     procedure LoginFailure(Sender: TObject; const Username: string; const IsSuccess: Boolean);
 
@@ -61,6 +62,7 @@ begin
   if IsSuccess then
   begin
     //ShowMessage(Format('%s님, 로그인에 성공하였습니다.', [Username]));
+
     LoggedUser := Username;
     self.ModalResult := mrOk;
   end;
@@ -81,37 +83,46 @@ procedure TLoginfrm.LoginFailure(Sender: TObject; const Username: string; const 
 begin
   if not IsSuccess then
   begin
-    ShowMessage(Format('%s님, 로그인에 실패하였습니다. 사용자 이름 또는 비밀번호를 확인하세요.', [Username]));
+    MessageDlg(Format('%s님, 로그인에 실패하였습니다. 사용자 이름 또는 비밀번호를 확인하세요.', [Username]), mtWarning, [mbOK], 0);
   end;
 end;
 
 procedure TLoginfrm.LoginButtonClick(Sender: TObject);
 var
-  DBProce: TDBProce;
   LoginControl: TLoginControl;
   Username, Password: string;
-
 begin
-  DBProce := TDBProce.Create;
-  LoginControl := TLoginControl.Create(DBProce);
-
   try
+    FDBProce := TDBProce.GetInstance;
+    LoginControl := TLoginControl.Create(FDBProce);
+
+    // 입력 값 검증 추가
     Username := UsernameField.Text;
     Password := PasswordField.Text;
+    if (Username = '') or (Password = '') then
+    begin
+      ShowMessage('사용자 이름과 비밀번호를 입력해주세요.');
+      Exit; // 입력 값이 비어 있으면 여기서 처리를 중단합니다.
+    end;
 
-    // 로그인 성공 이벤트 핸들러를 설정합니다.
-    LoginControl.OnLoginSuccess := LoginSuccess;
+    FDBProce.Connect('C:\Users\KDHS\Desktop\MarkAssets\MarkAssets\Win32\Release\ConnectionDef.ini');
 
-    // 로그인 실패 이벤트 핸들러를 설정합니다.
-    LoginControl.OnLoginFailure := LoginFailure;
-
-    // 로그인을 처리합니다.
-    LoginControl.Login(Username, Password);
-  finally
-    LoginControl.Free;
-    DBProce.Free;
+    try
+      LoginControl.OnLoginSuccess := LoginSuccess;
+      LoginControl.OnLoginFailure := LoginFailure;
+      LoginControl.Login(Username, Password);
+    finally
+      LoginControl.Free;
+    end;
+  except
+    on E: Exception do
+      ShowMessage('오류 발생: ' + E.Message);
   end;
 end;
+
+
+
+
 
 
 

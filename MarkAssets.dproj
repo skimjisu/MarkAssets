@@ -115,7 +115,7 @@
         <DCCReference Include="view\uDashboard.pas">
             <Form>DashbdFrm</Form>
         </DCCReference>
-        <DCCReference Include="Controller\FactoryProce.pas"/>
+        <DCCReference Include="view\uFactory.pas"/>
         <DCCReference Include="view\uInventory.pas">
             <Form>InvFrm</Form>
         </DCCReference>
@@ -124,6 +124,15 @@
         </DCCReference>
         <DCCReference Include="Model\DataStruct.pas"/>
         <DCCReference Include="model\uDataHandler.pas"/>
+        <DCCReference Include="model\uDBConnect.pas"/>
+        <DCCReference Include="model\AccountHandler.pas">
+            <Form>/uDBInfofrm in &apos;view\uDBInfofrm.pas&apos; {DBInfofrm</Form>
+        </DCCReference>
+        <DCCReference Include="view\uAssets.pas">
+            <Form>AssetsFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="model\uLogManager.pas"/>
         <None Include="README.md"/>
         <None Include=".gitattributes"/>
         <None Include="DB\MarkDB.sql"/>
@@ -1012,6 +1021,7 @@
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
+            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

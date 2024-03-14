@@ -3,7 +3,7 @@ unit uMain;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.ComCtrls, uFactory, uInventory, DataStruct,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.ComCtrls, uFactory, uInventory, DataStruct, uAssets,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Grids, Vcl.Imaging.pngimage, Vcl.Buttons, LoginProce, Common, RoundProce, uDashboard, DBProce,
   System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection;
 
@@ -121,8 +121,7 @@ begin
   TabSheet := TControlFactory.CreateAndSetupTabSheet(FPageControl, TabCaption);
   TControlFactory.CreateAndSetupForm(TabSheet, FormClass);
 
-  for i := 0 to FPageControl.PageCount - 1 do
-    FPageControl.Pages[i].TabVisible := False;
+  for i := 0 to FPageControl.PageCount - 1 do FPageControl.Pages[i].TabVisible := False;
 end;
 
 procedure TMainfrm.FormCreate(Sender: TObject);
@@ -134,9 +133,11 @@ begin
 
   CreateFormInTab('Dashboard', TDashbdFrm);
   CreateFormInTab('Inventory', TInvFrm);
+  CreateFormInTab('Assets', TAssetsFrm);
 
   Application.ProcessMessages;
   FPageControl.ActivePageIndex := 0;
+
 end;
 
 procedure TMainfrm.FormDestroy(Sender: TObject);
@@ -164,6 +165,7 @@ end;
 procedure TMainfrm.FormShow(Sender: TObject);
 begin
   UserBtn.Caption := LoggedUser;
+
 end;
 
 procedure TMainfrm.Label10Click(Sender: TObject);

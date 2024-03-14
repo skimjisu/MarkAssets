@@ -25,8 +25,6 @@ object Loginfrm: TLoginfrm
     Color = 4471089
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 270
-    ExplicitHeight = 301
     object LogoPanel: TPanel
       Left = 0
       Top = 0
@@ -36,7 +34,6 @@ object Loginfrm: TLoginfrm
       BevelOuter = bvNone
       TabOrder = 0
       OnMouseMove = MoveForm
-      ExplicitWidth = 270
       object Image1: TImage
         Left = 88
         Top = 8
@@ -265,7 +262,6 @@ object Loginfrm: TLoginfrm
       BevelOuter = bvNone
       TabOrder = 1
       OnMouseMove = MoveForm
-      ExplicitHeight = 185
       object LoginButton: TSpeedButton
         Left = 8
         Top = 105

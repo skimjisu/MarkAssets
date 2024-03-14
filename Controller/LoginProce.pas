@@ -3,7 +3,7 @@ unit LoginProce;
 interface
 
 uses
-  System.SysUtils, FireDAC.Comp.Client, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, System.Hash,
+  System.SysUtils, FireDAC.Comp.Client, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, System.Hash, VCL.TMSFNCGridDatabaseAdapter,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, DBProce, DataStruct,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, System.Classes, System.Variants,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.DApt, FireDAC.Comp.UI, windows, Vcl.Dialogs, Common;
@@ -17,6 +17,7 @@ type
     FOnLoginFailure: TLoginEvent;
     FFields, FValues : TStringList;
     FLoggedUser: string;
+    Adapter: TTMSFNCGridDatabaseAdapter;
   public
     constructor Create(DBProce: TDBProce);
     destructor Destroy; override;
@@ -49,13 +50,11 @@ begin
 
   if IsSuccess then
   begin
-    if Assigned(FOnLoginSuccess) then
-      FOnLoginSuccess(Self, Username, IsSuccess);
+    if Assigned(FOnLoginSuccess) then FOnLoginSuccess(Self, Username, IsSuccess);
   end
   else
   begin
-    if Assigned(FOnLoginFailure) then
-      FOnLoginFailure(Self, Username, IsSuccess);
+    if Assigned(FOnLoginFailure) then FOnLoginFailure(Self, Username, IsSuccess);
   end;
 end;
 

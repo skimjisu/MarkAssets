@@ -12,13 +12,19 @@ uses
   Common in 'Common.pas',
   RoundProce in 'Controller\RoundProce.pas',
   uDashboard in 'view\uDashboard.pas' {DashbdFrm},
-  FactoryProce in 'Controller\FactoryProce.pas',
+  uFactory in 'view\uFactory.pas',
   uInventory in 'view\uInventory.pas' {InvFrm},
   uAddInventory in 'view\uAddInventory.pas' {AddFrm},
   DataStruct in 'Model\DataStruct.pas',
   uDataHandler in 'model\uDataHandler.pas',
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  uDBConnect in 'model\uDBConnect.pas',
+  AccountHandler in 'model\AccountHandler.pas' {/uDBInfofrm in 'view\uDBInfofrm.pas' {DBInfofrm},
+  uAssets in 'view\uAssets.pas' {AssetsFrm},
+  uLogManager in 'model\uLogManager.pas';
+
+//uDBInfofrm in 'view\uDBInfofrm.pas' {DBInfofrm};
 
 {$R *.res}
 
@@ -32,6 +38,8 @@ begin
     if LoginFrm.ShowModal = mrOk then // 로그인 폼이 성공적으로 닫히면
     begin
       Application.CreateForm(TMainfrm, Mainfrm);
+  Application.CreateForm(TAssetsFrm, AssetsFrm);
+  // Application.CreateForm(TDBInfofrm, DBInfofrm);
   // 메인 폼을 생성합니다.
       Application.CreateForm(TDashbdFrm, DashbdFrm); // 추가 폼을 생성합니다.
       Application.CreateForm(TInvFrm, InvFrm); // 추가 폼을 생성합니다.

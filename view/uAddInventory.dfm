@@ -12,6 +12,7 @@ object AddFrm: TAddFrm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poOwnerFormCenter
+  OnDestroy = FormDestroy
   TextHeight = 15
   object MainPanel: TPanel
     Left = 0
@@ -97,7 +98,7 @@ object AddFrm: TAddFrm
       ParentFont = False
     end
     object Type_lb: TLabel
-      Left = 274
+      Left = 290
       Top = 68
       Width = 71
       Height = 17
@@ -109,33 +110,6 @@ object AddFrm: TAddFrm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-    end
-    object Add_Btn: TSpeedButton
-      Left = 290
-      Top = 295
-      Width = 103
-      Height = 57
-      Caption = 'Insert'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
-    object Cancel_Btn: TSpeedButton
-      Left = 408
-      Top = 295
-      Width = 103
-      Height = 57
-      Caption = 'Cancel'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-      OnClick = Cancel_BtnClick
     end
     object Contract_lb: TLabel
       Left = 290
@@ -212,7 +186,7 @@ object AddFrm: TAddFrm
         Width = 537
         Height = 38
       end
-      object AessetEdit: TEdit
+      object AssetEdit: TEdit
         Left = 0
         Top = 0
         Width = 261
@@ -309,7 +283,7 @@ object AddFrm: TAddFrm
     object AssetIDPanel: TPanel
       Left = 18
       Top = 91
-      Width = 175
+      Width = 261
       Height = 38
       BevelOuter = bvNone
       ParentColor = True
@@ -323,7 +297,7 @@ object AddFrm: TAddFrm
       object Edit4: TEdit
         Left = 0
         Top = 0
-        Width = 175
+        Width = 261
         Height = 38
         Margins.Left = 8
         Margins.Top = 8
@@ -344,9 +318,9 @@ object AddFrm: TAddFrm
       end
     end
     object TypePanel: TPanel
-      Left = 274
+      Left = 290
       Top = 91
-      Width = 137
+      Width = 221
       Height = 38
       BevelOuter = bvNone
       Color = 16183529
@@ -355,7 +329,7 @@ object AddFrm: TAddFrm
       object TypeCombo: TTMSFNCComboBox
         Left = 0
         Top = 0
-        Width = 137
+        Width = 221
         Height = 38
         Align = alClient
         ParentDoubleBuffered = False
@@ -530,5 +504,24 @@ object AddFrm: TAddFrm
         TabOrder = 0
       end
     end
+    object Button2: TButton
+      Left = 408
+      Top = 295
+      Width = 103
+      Height = 57
+      Caption = 'CANCEL'
+      TabOrder = 8
+      OnClick = Button2Click
+    end
+  end
+  object Button1: TButton
+    Left = 290
+    Top = 295
+    Width = 103
+    Height = 57
+    Caption = 'OK'
+    ModalResult = 1
+    TabOrder = 1
+    OnClick = Button1Click
   end
 end
