@@ -47,26 +47,6 @@ begin
   inherited;
 end;
 
-(*
-  procedure TLoginControl.Login(const Username, Password: string);
-  var
-    IsSuccess: Boolean;
-  begin
-    IsSuccess := FDBProce.ValidateUser(Username, THashSHA2.GetHashString(Password, THashSHA2.TSHA2Version.SHA256));
-
-    if IsSuccess then
-    begin
-      if Assigned(FOnLoginSuccess) then
-        FOnLoginSuccess(Self, Username, IsSuccess);
-    end
-    else
-    begin
-      if Assigned(FOnLoginFailure) then
-        FOnLoginFailure(Self, Username, IsSuccess);
-    end;
-  end;
-*)
-
 procedure TLoginControl.Login(const Username, Password: string);
 begin
   if ValidateUser(Username, THashSHA2.GetHashString(Password, THashSHA2.TSHA2Version.SHA256)) then
