@@ -29,7 +29,9 @@ type
   private
     { Private declarations }
     FDBProce: TDBProce;
-    //FConnectInfo: TConnectInfo;
+    LoginControl: TLoginControl;
+
+
     procedure LoginSuccess(Sender: TObject; const Username: string; const IsSuccess: Boolean);
     procedure LoginFailure(Sender: TObject; const Username: string; const IsSuccess: Boolean);
 
@@ -50,6 +52,14 @@ implementation
 procedure TLoginfrm.FormCreate(Sender: TObject);
 begin
   SetRoundedCorners(self.Handle, TRoundedWindowCornerType(2));
+  // 애플리케이션 시작 시 데이터베이스 연결 초기화
+  FDBProce := TDBProce.GetInstance;
+  FDBProce.Connect('C:\Users\KDHS\Desktop\MarkAssets\MarkAssets\Win32\Release\ConnectionDef.ini');    // 추후 외부 데이터 연결로 변경예정
+
+  // 로그인 컨트롤 인스턴스 생성
+  LoginControl := TLoginControl.Create(FDBProce.GetInstance.FDConnection);
+  LoginControl.OnLoginSuccess := LoginSuccess;
+  LoginControl.OnLoginFailure := LoginFailure;
 end;
 
 procedure TLoginfrm.FormDestroy(Sender: TObject);
@@ -89,14 +99,10 @@ end;
 
 procedure TLoginfrm.LoginButtonClick(Sender: TObject);
 var
-  LoginControl: TLoginControl;
   Username, Password: string;
 begin
   try
-    FDBProce := TDBProce.GetInstance;
-    LoginControl := TLoginControl.Create(FDBProce);
-
-    // 입력 값 검증 추가
+    // 입력 값 검증
     Username := UsernameField.Text;
     Password := PasswordField.Text;
     if (Username = '') or (Password = '') then
@@ -105,15 +111,8 @@ begin
       Exit; // 입력 값이 비어 있으면 여기서 처리를 중단합니다.
     end;
 
-    FDBProce.Connect('C:\Users\KDHS\Desktop\MarkAssets\MarkAssets\Win32\Release\ConnectionDef.ini');
-
-    try
-      LoginControl.OnLoginSuccess := LoginSuccess;
-      LoginControl.OnLoginFailure := LoginFailure;
-      LoginControl.Login(Username, Password);
-    finally
-      LoginControl.Free;
-    end;
+    // 로그인 시도
+    LoginControl.Login(Username, Password);
   except
     on E: Exception do
       ShowMessage('오류 발생: ' + E.Message);
