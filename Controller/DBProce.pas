@@ -48,21 +48,19 @@ type
     procedure EndTransaction(const ATransaction: TFDTransaction; const ACommit: Boolean);
 
     function LoadTableData(const TableName: string): TFDMemTable;
-    function UserExists(const Username: string): Boolean;
-    procedure CreateUser(const Username, Password: string);
-    function ValidateUser(const Username, PasswordHash: string): Boolean;
-   // procedure ExecuteQuery(const SQL: string; const Params: TFDParams);
+
     procedure ExecuteStoredProce(const SPName: string; const Params: TFDParams);
     property FDConnection: TFDConnection read GetFDConnection;
     function ManageData(const SQL: string; const Params: TFDParams; Operation: TDataOperation): TFDQuery;
     function ExecuteQuery(const SQL: string; const Params: TFDParams; Operation: TDataOperation): TFDQuery;
-    procedure SetDataBingings(aBindSourceDB: TBindSourceDB; aGrid: TTMSFNCGrid);
+   // procedure SetDataBingings(aBindSourceDB: TBindSourceDB; aGrid: TTMSFNCGrid);
     procedure AddDataToTable(const TableName: string; const Params: array of Variant);
     procedure LoadTableDataToGridLiveBinding(const TableName: string; Grid: TTMSFNCGrid);
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
     function LoadDataWithTransaction(const ATableName: string): TFDQuery;
+    function IsValidTableName(const ATableName: string): Boolean;
   end;
 
 
@@ -179,7 +177,13 @@ begin
   Result := TFDQuery.Create(nil); // TFDQuery 객체 생성
   try
     Result.Connection := FFDConnection; // FFDConnection과 연결
-    Result.SQL.Text := Format('SELECT * FROM %s', [ATableName]); // SQL 쿼리 설정
+
+    if IsValidTableName(ATableName) then // IsValidTableName은 허용된 테이블 이름을 검증하는 함수
+    begin
+      Result.SQL.Text := 'SELECT * FROM ' + ATableName; // 여기서 ATableName은 검증된 상태
+    end
+    else
+      raise Exception.Create('Invalid table name.');
 
     // 트랜잭션 시작
     FFDConnection.StartTransaction;
@@ -202,6 +206,22 @@ begin
   end;
 end;
 
+function TDBProce.IsValidTableName(const ATableName: string): Boolean;
+var
+  AllowedTableNames: TStringList;
+begin
+  AllowedTableNames := TStringList.Create;
+  try
+    // 허용된 테이블 이름 추가
+    AllowedTableNames.Add('Assets');
+    AllowedTableNames.Add('Inventory');
+
+    // IndexOf 메서드는 목록에 해당 문자열이 있으면 0 이상의 인덱스를 반환하고, 없으면 -1을 반환
+    Result := AllowedTableNames.IndexOf(ATableName) >= 0;
+  finally
+    AllowedTableNames.Free;
+  end;
+end;
 
 procedure TDBProce.AddDataToTable(const TableName: string; const Params: array of Variant);
 var
@@ -300,22 +320,6 @@ begin
   ATransaction.Free;
 end;
 
-function TDBProce.UserExists(const Username: string): Boolean;
-var
-  Query: TFDQuery;
-begin
-  Query := TFDQuery.Create(FFDConnection);
-  try
-    Query.Connection := FFDConnection;
-    Query.SQL.Text := 'SELECT COUNT(*) FROM Admins WHERE Username = :username';
-    Query.ParamByName('username').AsString := Username;
-    Query.Open;
-    Result := Query.Fields[0].AsInteger > 0;
-  finally
-    Query.Free;
-  end;
-end;
-
 procedure TDBProce.ExecuteStoredProce(const SPName: string; const Params: TFDParams);
 var
   Query: TFDStoredProc;
@@ -339,47 +343,6 @@ begin
         LogManager.LogError(E); // 예외 정보 로깅
         raise; // 예외 재발생
       end;
-    end;
-  finally
-    Query.Free;
-  end;
-end;
-
-// 사용자 계정을 데이터베이스에 생성하는 메소드
-procedure TDBProce.CreateUser(const Username, Password: string);
-var
-  Query: TFDQuery;
-begin
-  Query := TFDQuery.Create(FFDConnection);
-  try
-    Query.Connection := FFDConnection;
-    Query.SQL.Text := 'INSERT INTO Admins (Username, Password, authority_level) VALUES (:Username, :Password, :authority_level)';
-    Query.ParamByName('Username').AsString := Username;
-    Query.ParamByName('Password').AsString := Password;
-    Query.ParamByName('authority_level').AsString := '모두';
-    Query.ExecSQL;
-  finally
-    Query.Free;
-  end;
-end;
-
-// 사용자의 유효성??검증하는 메소드
-function TDBProce.ValidateUser(const Username, PasswordHash: string): Boolean;
-var
-  Query: TFDQuery;
-begin
-  Result := False;
-
-  Query := TFDQuery.Create(FFDConnection);
-  try
-    Query.Connection := FFDConnection;
-    Query.SQL.Text := 'SELECT Password FROM Admins WHERE Username = :Username';
-    Query.ParamByName('Username').AsString := Username;
-    Query.Open;
-
-    if not Query.Eof then
-    begin
-      Result := Query.FieldByName('Password').AsString = PasswordHash;
     end;
   finally
     Query.Free;
